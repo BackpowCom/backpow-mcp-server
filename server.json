@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "com.backpow/pow-oracle",
+  "name": "com.backpow/pow-mining-oracle",
   "title": "BackPow PoW Oracle",
   "description": "Proof of Work oracle: solo mining odds, cost of production, hashrate, mining hardware",
   "version": "1.0.0",
