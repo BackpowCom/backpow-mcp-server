@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.wrangler/
+.ci-bundle/
+.dev.vars
+*.log
+.DS_Store
+key.pem

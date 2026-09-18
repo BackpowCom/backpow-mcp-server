@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  schedule:
+    # Daily, so a change in the deployed endpoint's behaviour surfaces without a push.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build, test and size-check
+    runs-on: ubuntu-latest
+
+    env:
+      # Gzipped Worker bundle ceiling, in bytes. The build measures ~43 KB; the
+      # budget leaves headroom while still catching an accidentally bundled data
+      # file or a heavyweight dependency pulled into the Worker graph.
+      MAX_GZIP_BYTES: 61440
+      WRANGLER_SEND_METRICS: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm test
+
+      - name: Build Worker bundle (dry run, no deploy)
+        run: npx wrangler deploy --dry-run --outdir=.ci-bundle
+
+      - name: Enforce gzipped bundle size budget
+        run: |
+          set -euo pipefail
+          if [ ! -d .ci-bundle ]; then
+            echo "::error::wrangler produced no bundle in .ci-bundle"
+            exit 1
+          fi
+
+          total=0
+          while IFS= read -r -d '' file; do
+            raw=$(wc -c < "$file")
+            gz=$(gzip -9 -c "$file" | wc -c)
+            total=$((total + gz))
+            printf '  %-48s raw %8s B   gzip %8s B\n' "${file#.ci-bundle/}" "$raw" "$gz"
+          done < <(find .ci-bundle -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.json' -o -name '*.wasm' \) -print0)
+
+          echo "Total gzipped bundle: ${total} B (budget ${MAX_GZIP_BYTES} B)"
+
+          if [ "$total" -eq 0 ]; then
+            echo "::error::measured 0 bytes - the bundle glob matched no files"
+            exit 1
+          fi
+
+          if [ "$total" -gt "$MAX_GZIP_BYTES" ]; then
+            echo "::error::Worker bundle is ${total} B gzipped, over the ${MAX_GZIP_BYTES} B budget. Check for a static import of a large data file (fetch it at runtime instead) or a newly bundled dependency."
+            exit 1
+          fi
+
+  conformance:
+    name: Protocol conformance (deployed endpoint)
+    runs-on: ubuntu-latest
+    # Runs against the live endpoint rather than a Worker started inside the
+    # runner: the probe tests HTTP-layer behaviour, and the deployed service is
+    # the thing whose behaviour matters. Scheduled and manual only, so a
+    # transient network fault never fails a pull request.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Probe the deployed server
+        run: node scripts/conformance.mjs https://mcp.backpow.com

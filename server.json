@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.backpow/pow-oracle",
+  "title": "BackPow PoW Oracle",
+  "description": "Proof of Work oracle: solo mining odds, cost of production, hashrate, mining hardware",
+  "version": "1.0.0",
+  "websiteUrl": "https://backpow.com",
+  "repository": {
+    "url": "https://github.com/BackpowCom/backpow-mcp-server",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://backpow.com/logo.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.backpow.com/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@backpow/mcp-server",
+      "version": "1.0.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
