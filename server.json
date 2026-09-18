@@ -3,7 +3,7 @@
   "name": "com.backpow/pow-mining-oracle",
   "title": "BackPow PoW Oracle",
   "description": "Proof of Work oracle: solo mining odds, cost of production, hashrate, mining hardware",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://backpow.com",
   "repository": {
     "url": "https://github.com/BackpowCom/backpow-mcp-server",
@@ -19,6 +19,18 @@
     {
       "type": "streamable-http",
       "url": "https://mcp.backpow.com/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@backpow/mcp-server",
+      "version": "1.0.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      }
     }
   ]
 }
