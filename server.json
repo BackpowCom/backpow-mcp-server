@@ -20,17 +20,5 @@
       "type": "streamable-http",
       "url": "https://mcp.backpow.com/mcp"
     }
-  ],
-  "packages": [
-    {
-      "registryType": "npm",
-      "registryBaseUrl": "https://registry.npmjs.org",
-      "identifier": "@backpow/mcp-server",
-      "version": "1.0.0",
-      "runtimeHint": "npx",
-      "transport": {
-        "type": "stdio"
-      }
-    }
   ]
 }

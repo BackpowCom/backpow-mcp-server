@@ -12,14 +12,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run clean && tsc",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "test": "vitest run",
     "start": "node dist/cli.js",
     "prepublishOnly": "npm run typecheck && npm run build && npm test",
     "conformance": "node scripts/conformance.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "mcp",
