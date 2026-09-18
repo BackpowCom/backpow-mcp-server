@@ -8,9 +8,24 @@ benchmarks and PoW news — the same data published on
 [backpow.com](https://backpow.com).
 
 - **No authentication.** No accounts, API keys or tokens.
-- **No user data stored.** Tool arguments answer the call and are not retained.
+- **No database.** The server keeps no store of its own: tool arguments are used
+  to answer the call and are not written anywhere by the application.
 - **No writes.** No tool mutates state, moves funds, or acts on a user's behalf.
 - **No secrets shipped.** The npm CLI talks to the same public endpoints.
+
+What the platform retains is a separate matter, and worth stating plainly. The
+remote server runs on Cloudflare Workers, so Cloudflare records each invocation
+the way any web host does — source IP, timestamp and request metadata — under
+its own retention policy, and Workers observability is enabled for operational
+diagnostics. Some tool arguments describe a caller's setup rather than a public
+fact: an electricity tariff and a rig's power draw say something about their
+costs. They travel in the request body and are not logged by the application,
+but they do reach the platform as part of the request.
+
+Callers who would rather not send those values over the network can run the
+stdio server locally, or use the calculator on
+[backpow.com](https://backpow.com), which computes in the browser. The full
+statement is at [backpow.com/privacy](https://backpow.com/privacy).
 
 Only the latest npm release and the deployed Worker receive fixes.
 
