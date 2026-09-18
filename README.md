@@ -7,8 +7,9 @@ It gives an AI assistant live mining data for 126+ Proof of Work networks and 77
 hardware models: network difficulty and hashrate, Poisson solo-mining
 probabilities, Cost of Production, and hardware profitability.
 
-**Endpoint:** `https://mcp.backpow.com/mcp` — Streamable HTTP, no API key, no
-account.
+**Remote endpoint:** `https://mcp.backpow.com/mcp` — Streamable HTTP, no API key,
+no account.
+**Local package:** `@backpow/mcp-server` — the same six tools over stdio.
 
 ---
 
@@ -48,17 +49,13 @@ Settings → MCP → Add, or in `~/.cursor/mcp.json`:
 
 ### Local stdio
 
-The remote endpoint above is the supported path and works in every client listed.
-To run the server locally from a clone instead:
-
-```bash
-npm install && npm run build
-```
+For clients that run a local process instead of calling a URL. It talks to the
+same public endpoints as the remote server, so it needs no key either:
 
 ```json
 {
   "mcpServers": {
-    "backpow": { "command": "node", "args": ["/absolute/path/to/backpow-mcp-server/dist/cli.js"] }
+    "backpow": { "command": "npx", "args": ["-y", "@backpow/mcp-server"] }
   }
 }
 ```
