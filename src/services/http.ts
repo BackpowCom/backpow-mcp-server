@@ -67,6 +67,12 @@ export class BoundedCache<T> {
 
 /** Fresh window, and the outer bound past which stale data is refused outright. */
 export const DEFAULT_TTL_MS = 60_000;
+
+/**
+ * Data fetched within this window counts as live rather than cached: it is
+ * short enough that only reads inside the same tool call fall inside it.
+ */
+export const FRESH_WINDOW_MS = 1_000;
 export const MAX_STALE_MS = 15 * 60_000;
 
 /**
@@ -153,7 +159,18 @@ export async function cached<T>(
   const now = Date.now();
 
   if (hit && now - hit.storedAt < ttlMs) {
-    return { data: hit.data, servedFrom: 'cache', ageSeconds: Math.floor((now - hit.storedAt) / 1000) };
+    const ageMs = now - hit.storedAt;
+    // `served_from` describes the data, not this particular read. A single tool
+    // call reads the corpus more than once — the resolver looks up the id, then
+    // the handler reads the record — so the second read is always a cache hit
+    // even when the first one fetched from the origin moments earlier. Data
+    // fetched within the last second was fetched for this call, and labelling
+    // it as cached would understate its freshness.
+    return {
+      data: hit.data,
+      servedFrom: ageMs < FRESH_WINDOW_MS ? 'live' : 'cache',
+      ageSeconds: Math.floor(ageMs / 1000),
+    };
   }
 
   try {
