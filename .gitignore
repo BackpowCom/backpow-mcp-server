@@ -7,3 +7,6 @@ dist/
 .DS_Store
 key.pem
 *.tgz
+
+# Copie di conflitto di Syncthing: mai committate, mai compilate, mai pubblicate
+*.sync-conflict-*
