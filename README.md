@@ -126,6 +126,9 @@ transaction.
 
 ## Development
 
+Node 22 or newer is required: the Cloudflare Workers toolchain needs it. The
+published package itself runs on Node 20 and above.
+
 ```bash
 npm install
 npm run typecheck     # tsc --noEmit
