@@ -1,7 +1,7 @@
 {
   "name": "@backpow/mcp-server",
   "mcpName": "com.backpow/pow-mining-oracle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The official Model Context Protocol (MCP) server for BackPow - The Proof of Work Oracle",
   "type": "module",
   "main": "dist/index.js",

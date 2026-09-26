@@ -16,7 +16,7 @@ import { BACKPOW_TOOLS, dispatchTool } from './tools/registry.js';
 import { ToolError } from './errors.js';
 
 export const SERVER_NAME = 'backpow-mcp';
-export const SERVER_VERSION = '1.0.0';
+export const SERVER_VERSION = '1.0.1';
 export const SERVER_TITLE = 'BackPow — The Proof of Work Oracle';
 export const WEBSITE_URL = 'https://backpow.com';
 

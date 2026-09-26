@@ -24,6 +24,9 @@ import {
   negotiateProtocolVersion,
   runTool,
 } from './server.js';
+import { AGENT_CARD, ROBOTS_TXT, SERVER_MANIFEST } from './discovery.js';
+import { OPENAPI_SPEC } from './openapi.js';
+import { handleRestRequest } from './rest.js';
 import { ToolError } from './errors.js';
 
 interface Env {
@@ -167,6 +170,65 @@ export default {
         200,
         origin
       );
+    }
+
+    // Agent-to-Agent (A2A) protocol discovery card
+    if (
+      request.method === 'GET' &&
+      (url.pathname === '/.well-known/agent-card.json' || url.pathname === '/.well-known/agent.json')
+    ) {
+      return json(AGENT_CARD, 200, origin, {
+        'Cache-Control': 'public, max-age=3600',
+      });
+    }
+
+    // MCP registry server manifest
+    if (
+      request.method === 'GET' &&
+      (url.pathname === '/.well-known/mcp/server.json' || url.pathname === '/server.json')
+    ) {
+      return json(SERVER_MANIFEST, 200, origin, {
+        'Cache-Control': 'public, max-age=3600',
+      });
+    }
+
+    // Web crawler directives
+    if (request.method === 'GET' && url.pathname === '/robots.txt') {
+      return new Response(ROBOTS_TXT, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'public, max-age=86400',
+          ...corsHeaders(origin),
+        },
+      });
+    }
+
+    // OpenAPI 3.1 schema for OpenAI GPT Actions, LangChain, etc.
+    if (
+      request.method === 'GET' &&
+      (url.pathname === '/openapi.json' || url.pathname === '/.well-known/openapi.json')
+    ) {
+      return json(OPENAPI_SPEC, 200, origin, {
+        'Cache-Control': 'public, max-age=3600',
+      });
+    }
+
+    // REST API endpoints defined by OpenAPI (/v1/...)
+    if (url.pathname.startsWith('/v1/')) {
+      const deps = createDeps({ apiUrl: env.BACKPOW_API_URL, siteUrl: env.BACKPOW_SITE_URL });
+      let bodyData: Record<string, unknown> | null = null;
+      if (request.method === 'POST') {
+        try {
+          bodyData = (await request.json()) as Record<string, unknown>;
+        } catch {
+          bodyData = null;
+        }
+      }
+      const restResult = await handleRestRequest(url.pathname, url.searchParams, bodyData, deps);
+      if (restResult) {
+        return json(restResult.body, restResult.status, origin);
+      }
     }
 
     // Paths of the deprecated HTTP+SSE transport. 410 with the replacement

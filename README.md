@@ -15,6 +15,18 @@ no account.
 
 ## Install
 
+### ChatGPT (Custom GPTs & Actions)
+
+Connect BackPow's live PoW data directly to your ChatGPT:
+
+1. In ChatGPT, go to **Explore GPTs** → **+ Create** (or configure an existing GPT).
+2. Under **Configure**, scroll down to **Actions** → **Create new action**.
+3. Click **Import from URL** and paste:
+   ```text
+   https://mcp.backpow.com/openapi.json
+   ```
+4. Click **Import**. All 6 tools will populate automatically with zero authentication required.
+
 ### Claude Code
 
 ```bash
@@ -70,7 +82,7 @@ same public endpoints as the remote server, so it needs no key either:
 | `get_cost_of_production` | "Is mining Monero profitable?" — CoP vs spot, gross margin, the reference machine and tariff, 30-day trend |
 | `get_coin_oracle` | "What is Kaspa's current difficulty?" — live network state with a confidence block |
 | `list_pow_coins` | Browse or filter the tracked networks by algorithm or profitability |
-| `get_hardware_benchmarks` | "What should I mine with an RTX 4090 at $0.10/kWh?" — coins ranked by net USD/day |
+| `get_hardware_benchmarks` | "What should I mine with an RTX 4090 at 0.10 USD/kWh?" — coins ranked by net USD/day |
 | `get_pow_news` | Recent mining and network events, quoted as third-party content |
 
 All six are read-only and annotated `readOnlyHint`, so hosts that support

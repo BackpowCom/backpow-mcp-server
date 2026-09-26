@@ -38,7 +38,7 @@ export const BITCOIN_DETAIL: CoinDetailData = {
       difficulty: 1.2e14,
     },
     {
-      date: '2026-09-18',
+      date: new Date().toISOString().split('T')[0],
       cop: 44_472.35,
       usdPrice: 76_948,
       copRatio: 57.8,
